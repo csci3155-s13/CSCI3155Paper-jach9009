@@ -1,0 +1,58 @@
+OUTLINE
+
+PROBLEM
+Limitations of Java Arrays:
+-not a single array type representation
+  -one for reference type
+	-eight for primitive types
+-only monomorphic array creations allowed, no generic
+-only supported ops are indexing, updating, and get length
+
+Goals of Scala Arrays:
+-have support for methods that are defined on sequences under the collections hierarchy
+-should be generic, ex) Array[T] where T is type
+
+PAST
+Implementation
+-Scala would wrap and unwrap arrays called boxing and unboxing
+-ex) new Array[T] -> new BoxedAnyArray[T]
+-BoxedAnyArray class was special wrapper class that would change rep according to type of java array to which it was cast
+
+Problems
+-caused leaks and was hard to tell where leaks came from
+-**add more about examples of leaks
+
+PROPOSALS
+-David MacIver: simply have two types of arrays, one like java and one to be part of the scala collection hierarchy
+	-java would be fast and interoperable
+	-scala would have lots of methods
+-MacIver and Koltsov: split method taking array as argument into both versions
+-use method similar to string/rich string, but causes problems such as in comparisons because richstring and string are not comparable especially when methods are being applied as well
+
+ARRAYS INTO COLLECTIONS
+-two implicit conversions
+	1-map Array[T] to object of type ArrayOps, a subtype of VectorLike[T, Array[T]]
+	  -all sequence ops are available and methods return arrays
+	  -works except when converting an array to a real seq
+	2-converts array into WrappedArray which is a mutable Vector that implements 	   all vector ops on the array
+	-WrappedArray returns WrappedArray
+	-ArrayOps object returns Array
+-Scala clause to avoid ambiguities applied to arrays
+	-allows us to prioritize Array -> ArrayOps over Array -> WrappedArray
+	-so now calling a sequence method always converts to ArrayOps
+	-converts to WrappedArray only when an array needs to be converted to a 	 sequence
+	-same application for strings
+
+GENERIC ARRAY CREATION
+-since there is not a uniform array representation in Java we require additional runtime info about type T
+-Manifest and ClassManifest provide information about the type T and can be constructed from knowing only the top-level class of a type
+-this is a change from scala 2.7 to 2.8
+-GenericArray class allows creation without a class manifest because they have a uniform representation of Array[AnyRef]
+-Manifest is usually used
+-only time GenericArray is used is with sortWith method of class Seq (maybe use this as code example)
+
+OVERALL BENEFITS OF CHANGE
+-less compiler “magic”
+-allows for prioritization of implicits
+-can get type information at run time with manifests
+-context bounds can be easier to use with some types of implicit arguments/parameters
