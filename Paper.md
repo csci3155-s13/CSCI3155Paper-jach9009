@@ -41,3 +41,16 @@ Scala contains a clause to avoid ambiguity when using arrays. The conversion fro
 over Array to WrappedArray. This ensures that the WrappedArray type is only used when an array needs to be converted
 to a sequence. Strings have a similar application.
 
+Unlike in Java, Scala permits instance creations such as Array[T], with T being a type parameter. In order to implement 
+this, additional runtime information describing type T must be acquired since Java does not have a uniform array 
+representation. The Manifest mechanism in Scala 2.8 yields this information about type T with a Manifest[T] object. 
+ClassManifest does the same, and these can be used knowing only the top-level class of type T. The GenericArray class 
+in Scala 2.8 allows array creation without a class manifest, because they have a uniform representation in that all 
+elements are kept in an Array[AnyRef]. GenericArray allows the programmer to use a generic array if the class manifest 
+is impossible to get (with Manifest[T].) The only time GeneticArray is used is with the sortWith method of class Seq. 
+*code example*
+
+The new Scala collection framework fixes the array problems that have caused issues in the language. There are various 
+benefits of this change. For one, much of the compiler "magic" is removed. Multiple features are new to Scala and very 
+useful. Prioritization of implicates is allowed, manifests yield type information at runtime, and context bounds can be 
+easier to use with some types of implicit arguments or parameters. 
