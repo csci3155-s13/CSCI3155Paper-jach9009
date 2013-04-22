@@ -27,3 +27,17 @@ similar to that of Java which would be fast and interoperable, but also one that
 This second type would have the potential to use all the methods already defined in Scala. MacIver later collaborated 
 with Koltsov and proposed a slightly different idea. Whenever an array was an argument the compiler would simply split 
 the method into both type versions of the array.
+
+
+Arrays were incorporated into Scala collections through two implicit conversions.
+The first conversion mapped an Array[T] to an object of type ArrayOps. This made all sequence operations
+available, and these methods would return objects of type Array. This works in all cases except when converting 
+an array to a real sequence. This leads to the next type of conversion, from Array to WrappedArray. A WrappedArray
+is a mutable vector that includes all vector operations. When using these conversions it is important to understand
+that using a method on a WrappedArray returns another WrappedArray, whereas using a a method on an ArrayOps object
+just returns an Array.
+
+Scala contains a clause to avoid ambiguity when using arrays. The conversion from Array to ArrayOps is prioritized 
+over Array to WrappedArray. This ensures that the WrappedArray type is only used when an array needs to be converted
+to a sequence. Strings have a similar application.
+
